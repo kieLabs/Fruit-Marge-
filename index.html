@@ -1,125 +1,1519 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#10251e">
-  <meta name="description" content="Play Fruit Merge Game for free. Drop and merge fruits, unlock bigger fruits and beat your high score.">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#111529">
+<meta name="description" content="Fruit Merge — Drop fruits, merge matching fruits, and grow the biggest watermelon!">
+<title>Fruit Merge — A Sweet Little Puzzle</title>
 
-  <title>Fruit Merge Game — Play Free Online</title>
+<style>
+:root{
+  --bg:#111529;
+  --panel:#202641;
+  --panel2:#2b3354;
+  --text:#fff;
+  --muted:#b5bfdc;
+  --gold:#ffd36d;
+  --mint:#8ce9b1;
+  --border:rgba(255,255,255,.12);
+}
 
-  <!-- Connect CSS -->
-  <link rel="stylesheet" href="style.css">
+*{box-sizing:border-box}
+
+html{
+  min-height:100%;
+  background:var(--bg);
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(ellipse at 50% 0%,#34385f 0%,transparent 48%),
+    linear-gradient(160deg,#111529,#191d35 60%,#101326);
+  -webkit-tap-highlight-color:transparent;
+}
+
+button,select,input{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+button:focus-visible,select:focus-visible{
+  outline:3px solid var(--mint);
+  outline-offset:3px;
+}
+
+.app-shell{
+  width:100%;
+  max-width:560px;
+  margin:0 auto;
+  padding:15px 12px 25px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.brand{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.brand-logo{
+  display:grid;
+  place-items:center;
+  width:47px;
+  height:47px;
+  flex-shrink:0;
+  border-radius:16px;
+  background:linear-gradient(145deg,#ffe88d,#ff926e);
+  font-size:27px;
+  box-shadow:0 7px 22px #ff9d6b35;
+}
+
+.brand h1{
+  margin:0;
+  font-size:clamp(19px,5vw,25px);
+  font-weight:900;
+  letter-spacing:-.7px;
+}
+
+.brand p{
+  margin:3px 0 0;
+  color:var(--muted);
+  font-size:11px;
+}
+
+.icon-btn{
+  display:grid;
+  place-items:center;
+  width:43px;
+  height:43px;
+  flex-shrink:0;
+  border:1px solid var(--border);
+  border-radius:14px;
+  color:#fff;
+  background:var(--panel);
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.stat{
+  padding:11px 14px;
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:rgba(32,38,65,.92);
+}
+
+.stat-label{
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.stat-value{
+  margin-top:3px;
+  font-size:25px;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+
+.game-panel{
+  overflow:hidden;
+  padding:11px;
+  border:1px solid var(--border);
+  border-radius:23px;
+  background:rgba(32,38,65,.96);
+  box-shadow:0 15px 40px #00000025;
+}
+
+.game-toolbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.toolbar-title{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.next-fruit{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  font-weight:800;
+}
+
+#nextCanvas{
+  display:block;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:#ffffff09;
+}
+
+.playfield{
+  position:relative;
+  width:100%;
+  overflow:hidden;
+  border:2px solid #ffffff19;
+  border-radius:17px;
+  background:#1a1f37;
+  line-height:0;
+}
+
+#canvas{
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio:420 / 620;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+.aim-hint{
+  margin:10px 0 0;
+  color:var(--muted);
+  text-align:center;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.shelf{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:5px;
+  margin-top:11px;
+}
+
+.fruit-chip{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:5px 8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  color:var(--muted);
+  background:#ffffff05;
+  font-size:10px;
+}
+
+.fruit-chip span:first-child{font-size:15px}
+
+.boost-row{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;
+  margin-top:12px;
+}
+
+.boost-button{
+  min-width:0;
+  padding:10px 2px 8px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  color:#fff;
+  background:var(--panel2);
+  transition:background .15s,transform .15s;
+}
+
+.boost-button:active:not(:disabled){
+  transform:scale(.96);
+}
+
+.boost-button:hover:not(:disabled){
+  background:#394365;
+}
+
+.boost-icon{
+  display:block;
+  margin-bottom:3px;
+  font-size:21px;
+}
+
+.boost-name{
+  display:block;
+  font-size:11px;
+  font-weight:800;
+}
+
+.boost-count{
+  display:block;
+  margin-top:3px;
+  color:var(--gold);
+  font-size:11px;
+}
+
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:11px;
+}
+
+.action-btn{
+  min-height:43px;
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:13px;
+  color:#fff;
+  background:#ffffff0b;
+  font-weight:750;
+}
+
+.action-btn:hover{background:#ffffff17}
+
+.action-btn.primary{
+  border:0;
+  color:#29203c;
+  background:linear-gradient(135deg,#ffe889,#ffb76b);
+}
+
+.action-btn.primary:hover{filter:brightness(1.05)}
+
+.info-card{
+  margin-top:12px;
+  padding:14px;
+  border:1px solid var(--border);
+  border-radius:17px;
+  background:#202641c9;
+}
+
+.info-card h2{
+  margin:0 0 5px;
+  font-size:14px;
+}
+
+.info-card p{
+  margin:0;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.7;
+}
+
+.footer{
+  padding:18px 5px 0;
+  color:#98a2c3;
+  text-align:center;
+  font-size:11px;
+}
+
+/* Modal windows */
+
+.modal-layer{
+  position:fixed;
+  z-index:1000;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:auto;
+  padding:16px;
+  background:#080b18c9;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+
+.hidden{display:none!important}
+
+.modal-card{
+  width:100%;
+  max-width:410px;
+  max-height:90vh;
+  overflow:auto;
+  padding:23px;
+  border:1px solid #ffffff20;
+  border-radius:25px;
+  background:linear-gradient(145deg,#252c4a,#1a2038);
+  box-shadow:0 24px 80px #0008;
+  text-align:center;
+}
+
+.modal-logo{
+  margin-bottom:5px;
+  font-size:55px;
+}
+
+.eyebrow{
+  margin:0 0 9px!important;
+  color:var(--mint)!important;
+  font-size:11px!important;
+  font-weight:900;
+  letter-spacing:2px;
+}
+
+.modal-card h2{
+  margin:0 0 10px;
+  font-size:clamp(26px,7vw,36px);
+  line-height:1.12;
+  letter-spacing:-1px;
+}
+
+.modal-card p{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.7;
+}
+
+.fruit-line{
+  margin:17px 0;
+  font-size:24px;
+  letter-spacing:2px;
+  overflow-wrap:anywhere;
+}
+
+.modal-card .action-btn{
+  width:100%;
+  min-height:47px;
+  margin-top:9px;
+}
+
+.modal-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.modal-heading h2{
+  text-align:left;
+  font-size:23px;
+}
+
+.modal-card label{
+  display:block;
+  margin:14px 0 6px;
+  color:var(--muted);
+  text-align:left;
+  font-size:12px;
+}
+
+.modal-card select{
+  display:block;
+  width:100%;
+  min-height:44px;
+  padding:9px 11px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  color:#fff;
+  background:#12172b;
+}
+
+.setting-check{
+  display:flex!important;
+  align-items:center;
+  gap:9px;
+  margin:15px 0!important;
+  text-align:left;
+}
+
+.setting-check input{
+  width:18px;
+  height:18px;
+  accent-color:var(--mint);
+}
+
+.toast{
+  position:fixed;
+  z-index:2000;
+  bottom:18px;
+  left:50%;
+  max-width:calc(100% - 24px);
+  padding:12px 17px;
+  border:1px solid #ffffff20;
+  border-radius:14px;
+  color:#fff;
+  background:#303956;
+  box-shadow:0 10px 30px #0005;
+  font-size:13px;
+  text-align:center;
+  transform:translateX(-50%);
+}
+
+@media(min-width:600px){
+  .app-shell{padding:22px 16px 30px}
+  .game-panel{padding:14px}
+}
+
+@media(max-width:360px){
+  .app-shell{padding:10px 8px 20px}
+  .brand-logo{width:41px;height:41px;font-size:23px}
+  .game-panel{padding:8px}
+  .boost-row{gap:4px}
+  .boost-name{font-size:10px}
+  .boost-button{padding:9px 1px}
+  .modal-card{padding:19px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    transition-duration:.01ms!important;
+  }
+}
+</style>
 </head>
+
 <body>
 
-<main id="app">
+<div class="app-shell">
 
-  <!-- Welcome screen -->
-  <section id="lobby" class="screen">
-    <div class="logo">🍉</div>
-    <p class="eyebrow">A SWEET LITTLE PUZZLE</p>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">🍉</div>
+      <div>
+        <h1>FRUIT MERGE</h1>
+        <p>A sweet little puzzle</p>
+      </div>
+    </div>
 
-    <h1>FRUIT <span>MERGE</span></h1>
-    <p class="tagline">Drop • Merge • Grow</p>
+    <button class="icon-btn" id="settingsBtn" aria-label="Settings" title="Settings">⚙️</button>
+  </header>
 
-    <div class="fruit-line">🍒 🫐 🍋 🍇 🍊 🍎 🍑 🥥 🍉</div>
+  <section class="stats">
+    <div class="stat">
+      <div class="stat-label">Your Score</div>
+      <div class="stat-value" id="scoreVal">0</div>
+    </div>
 
-    <button id="playNow" class="primary">▶ PLAY NOW</button>
-    <button id="lobbySettings" class="secondary">⚙ Settings &amp; Stages</button>
+    <div class="stat">
+      <div class="stat-label">Best Score</div>
+      <div class="stat-value" id="bestVal">0</div>
+    </div>
+  </section>
 
-    <p class="note">
-      Drop matching fruits together to make bigger fruits.
-      How big can you grow?
+  <main class="game-panel">
+
+    <div class="game-toolbar">
+      <div class="toolbar-title">DROP • MERGE • GROW</div>
+
+      <div class="next-fruit">
+        <span>Next fruit</span>
+        <canvas id="nextCanvas" width="84" height="84"></canvas>
+      </div>
+    </div>
+
+    <div class="playfield">
+      <canvas
+        id="canvas"
+        width="420"
+        height="620"
+        tabindex="0"
+        role="img"
+        aria-label="Fruit Merge game. Tap a position to drop a fruit. Merge matching fruits."
+      ></canvas>
+    </div>
+
+    <p class="aim-hint" id="aimHint">
+      Tap where you want to drop the fruit. Match the same fruits to merge them!
+    </p>
+
+    <div class="shelf" id="shelf"></div>
+
+    <div class="boost-row">
+      <button class="boost-button" id="bSwap" type="button">
+        <span class="boost-icon">🔄</span>
+        <span class="boost-name">Swap</span>
+        <span class="boost-count" id="cSwap">3</span>
+      </button>
+
+      <button class="boost-button" id="bBomb" type="button">
+        <span class="boost-icon">💣</span>
+        <span class="boost-name">Bomb</span>
+        <span class="boost-count" id="cBomb">2</span>
+      </button>
+
+      <button class="boost-button" id="bGrow" type="button">
+        <span class="boost-icon">🌱</span>
+        <span class="boost-name">Grow</span>
+        <span class="boost-count" id="cGrow">2</span>
+      </button>
+
+      <button class="boost-button" id="bMix" type="button">
+        <span class="boost-icon">🌀</span>
+        <span class="boost-name">Mix</span>
+        <span class="boost-count" id="cMix">2</span>
+      </button>
+    </div>
+
+    <div class="actions">
+      <button class="action-btn" id="pauseBtn" type="button">Ⅱ Pause</button>
+      <button class="action-btn primary" id="restartBtn" type="button">↻ Restart</button>
+    </div>
+
+  </main>
+
+  <section class="info-card">
+    <h2>🍓 How to play</h2>
+    <p>
+      Drop fruits into the basket. When two fruits of the same kind touch,
+      they merge into a bigger fruit and give you points. Keep merging,
+      avoid filling the basket, and try to create the biggest fruit!
     </p>
   </section>
 
-  <!-- Game screen -->
-  <section id="gameScreen" class="screen hidden">
+  <footer class="footer">
+    Fruit Merge · Play, merge and grow 🍉
+  </footer>
 
-    <header class="topbar">
-      <button id="homeBtn" class="icon" aria-label="Home">⌂</button>
+</div>
 
-      <div class="scorebox">
-        <small>BEST <b id="bestVal">0</b></small>
-        <strong id="scoreVal">0</strong>
-      </div>
+<!-- All game menus -->
 
-      <div class="nextbox">
-        <small>NEXT</small>
-        <canvas id="nextCanvas" width="54" height="54"></canvas>
-      </div>
+<div class="modal-layer" id="modalLayer">
 
-      <button id="settingsBtn" class="icon" aria-label="Settings">⚙</button>
-    </header>
+  <section class="modal-card" id="homePanel">
+    <div class="modal-logo">🍉</div>
+    <p class="eyebrow">A SWEET LITTLE PUZZLE</p>
+    <h2>FRUIT MERGE</h2>
+    <p>Drop matching fruits together. Merge them to grow bigger fruits. How big can you grow?</p>
 
-    <nav class="boosters">
-      <button id="bSwap" class="boost">🔄 <b id="cSwap">4</b></button>
-      <button id="bBomb" class="boost">💣 <b id="cBomb">1</b></button>
-      <button id="bGrow" class="boost">⬆️ <b id="cGrow">4</b></button>
-      <button id="bMix" class="boost">🎲 <b id="cMix">5</b></button>
-    </nav>
+    <div class="fruit-line">🍒 🫐 🍋 🍇 🍊 🍎 🍑 🥥 🍉</div>
 
-    <div id="playfield">
-      <canvas id="canvas" aria-label="Tap or click to drop a fruit"></canvas>
-      <div id="aimHint">TAP OR CLICK TO DROP</div>
-    </div>
+    <button class="action-btn primary" id="playNow" type="button">▶ PLAY NOW</button>
+    <button class="action-btn" id="homeSettingsBtn" type="button">⚙ Settings &amp; Stages</button>
 
-    <div id="shelf" aria-label="Fruit evolution guide"></div>
-
-    <p class="help">Drop fruits • Match two identical fruits to merge</p>
-
-    <div id="toast" role="status"></div>
+    <p style="margin-bottom:0">No account needed. Your best score is saved on this device.</p>
   </section>
 
-  <!-- Settings and game-over modal -->
-  <div id="modalLayer" class="modal-layer hidden">
-    <section class="modal" role="dialog" aria-modal="true">
+  <section class="modal-card hidden" id="settingsPanel">
+    <div class="modal-heading">
+      <h2>⚙ Settings</h2>
+      <button class="icon-btn" id="closeSettings" type="button" aria-label="Close settings">✕</button>
+    </div>
 
-      <button id="closeModal" class="close" aria-label="Close">×</button>
-      <h2 id="modalTitle">SETTINGS</h2>
+    <p>Adjust your game experience.</p>
 
-      <div id="settingsPanel">
-        <label class="row">
-          Stage
-          <select id="stageSelect">
-            <option value="1">Stage 1 — Easy</option>
-            <option value="2">Stage 2 — Classic</option>
-            <option value="3">Stage 3 — Quick</option>
-            <option value="4">Stage 4 — Expert</option>
-            <option value="5">Stage 5 — Chaos</option>
-          </select>
-        </label>
+    <label for="stageSelect">Game mode</label>
+    <select id="stageSelect">
+      <option value="classic">Classic — Normal gravity</option>
+      <option value="relaxed">Relaxed — Slower gravity</option>
+      <option value="challenge">Challenge — Faster gravity</option>
+    </select>
 
-        <label class="row">
-          Sound effects
-          <input id="soundToggle" type="checkbox" checked>
-        </label>
+    <label class="setting-check" for="soundToggle">
+      <input id="soundToggle" type="checkbox" checked>
+      <span>Sound effects</span>
+    </label>
 
-        <p class="modal-note">
-          Higher stages increase gravity and the variety of starting fruits.
-        </p>
+    <button class="action-btn primary" id="applySettings" type="button">SAVE SETTINGS</button>
+    <button class="action-btn" id="resumeBtn" type="button">← BACK TO GAME</button>
+  </section>
 
-        <button id="applySettings" class="primary">APPLY SETTINGS</button>
-        <button id="resumeBtn" class="secondary">RESUME GAME</button>
-      </div>
+  <section class="modal-card hidden" id="overPanel">
+    <div class="modal-logo">🍓</div>
+    <p class="eyebrow">BASKET FULL</p>
+    <h2>GAME OVER</h2>
+    <p>Your final score</p>
+    <div class="stat-value" id="finalScore">0</div>
+    <p>Great effort! Ready to grow an even bigger fruit?</p>
 
-      <div id="overPanel" class="hidden">
-        <p class="final-score">Score: <strong id="finalScore">0</strong></p>
-        <button id="restartBtn" class="primary">PLAY AGAIN</button>
-        <button id="overHomeBtn" class="secondary">BACK TO HOME</button>
-      </div>
+    <button class="action-btn primary" id="playAgainBtn" type="button">↻ PLAY AGAIN</button>
+    <button class="action-btn" id="overHomeBtn" type="button">⌂ HOME</button>
+  </section>
 
-    </section>
-  </div>
+</div>
 
-</main>
+<div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
 
-<!-- Physics library must load before game.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js" defer></script>
+<script>
+(() => {
+  "use strict";
 
-<!-- Connect JavaScript -->
-<script src="game.js" defer></script>
+  const $ = id => document.getElementById(id);
+
+  const canvas = $("canvas");
+  const ctx = canvas.getContext("2d");
+  const nextCanvas = $("nextCanvas");
+  const nctx = nextCanvas.getContext("2d");
+
+  const W = 420;
+  const H = 620;
+  const WALL = 12;
+  const FLOOR = H - 12;
+  const DANGER_LINE = 122;
+
+  const fruits = [
+    {name:"Cherry",     emoji:"🍒", r:15,  color:"#ff5577", points:1},
+    {name:"Blueberry",  emoji:"🫐", r:20,  color:"#7187ef", points:3},
+    {name:"Lemon",      emoji:"🍋", r:25,  color:"#ffdc54", points:6},
+    {name:"Grape",      emoji:"🍇", r:30,  color:"#a87af2", points:10},
+    {name:"Orange",     emoji:"🍊", r:35,  color:"#ff9f3d", points:15},
+    {name:"Apple",      emoji:"🍎", r:40,  color:"#fa535d", points:21},
+    {name:"Peach",      emoji:"🍑", r:45,  color:"#ff9fa1", points:28},
+    {name:"Coconut",    emoji:"🥥", r:51,  color:"#b8a28b", points:36},
+    {name:"Melon",      emoji:"🍈", r:58,  color:"#80d99a", points:46},
+    {name:"Watermelon", emoji:"🍉", r:67,  color:"#48ca7d", points:60}
+  ];
+
+  const BEST_KEY = "fruitMergeBest_v2";
+  const SOUND_KEY = "fruitMergeSound_v2";
+  const STAGE_KEY = "fruitMergeStage_v2";
+
+  let objects = [];
+  let score = 0;
+  let best = readNumber(BEST_KEY, 0);
+  let currentFruit = randomFruit();
+  let nextFruit = randomFruit();
+  let aimX = W / 2;
+  let canDrop = true;
+  let started = false;
+  let gameOver = false;
+  let paused = false;
+  let soundOn = readStoredSound();
+  let stage = readStage();
+  let dangerTime = 0;
+  let lastTime = 0;
+  let raf = 0;
+  let toastTimer = 0;
+  let audio = null;
+  let power = {swap:3,bomb:2,grow:2,mix:2};
+
+  const GRAVITY = {
+    classic:1050,
+    relaxed:650,
+    challenge:1450
+  };
+
+  function readNumber(key, fallback) {
+    try {
+      const n = Number(localStorage.getItem(key));
+      return Number.isFinite(n) && n >= 0 ? n : fallback;
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  function readStoredSound() {
+    try {
+      return localStorage.getItem(SOUND_KEY) !== "off";
+    } catch (_) {
+      return true;
+    }
+  }
+
+  function readStage() {
+    try {
+      const value = localStorage.getItem(STAGE_KEY);
+      return ["classic","relaxed","challenge"].includes(value) ? value : "classic";
+    } catch (_) {
+      return "classic";
+    }
+  }
+
+  function save(key, value) {
+    try {
+      localStorage.setItem(key, String(value));
+    } catch (_) {}
+  }
+
+  function randomFruit() {
+    return Math.floor(Math.random() * 5);
+  }
+
+  function radius(level) {
+    return fruits[Math.max(0, Math.min(level, fruits.length - 1))].r;
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function rand(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  function showToast(message) {
+    const el = $("toast");
+    el.textContent = message;
+    el.classList.remove("hidden");
+
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.add("hidden"), 1900);
+  }
+
+  function sound(frequency = 440, duration = .07, type = "sine") {
+    if (!soundOn) return;
+
+    try {
+      const Audio = window.AudioContext || window.webkitAudioContext;
+      if (!Audio) return;
+
+      if (!audio) audio = new Audio();
+      if (audio.state === "suspended") audio.resume();
+
+      const oscillator = audio.createOscillator();
+      const gain = audio.createGain();
+
+      oscillator.type = type;
+      oscillator.frequency.value = frequency;
+
+      gain.gain.setValueAtTime(.035, audio.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.001, audio.currentTime + duration);
+
+      oscillator.connect(gain);
+      gain.connect(audio.destination);
+
+      oscillator.start();
+      oscillator.stop(audio.currentTime + duration);
+    } catch (_) {}
+  }
+
+  function updateUI() {
+    $("scoreVal").textContent = score.toLocaleString();
+    $("bestVal").textContent = best.toLocaleString();
+    $("finalScore").textContent = score.toLocaleString();
+
+    $("cSwap").textContent = power.swap;
+    $("cBomb").textContent = power.bomb;
+    $("cGrow").textContent = power.grow;
+    $("cMix").textContent = power.mix;
+
+    $("bSwap").disabled = !started || paused || gameOver || power.swap <= 0;
+    $("bBomb").disabled = !started || paused || gameOver || power.bomb <= 0;
+    $("bGrow").disabled = !started || paused || gameOver || power.grow <= 0;
+    $("bMix").disabled = !started || paused || gameOver || power.mix <= 0;
+
+    $("pauseBtn").textContent = paused ? "▶ Resume" : "Ⅱ Pause";
+
+    updateShelf();
+    drawNext();
+  }
+
+  function updateShelf() {
+    const shelf = $("shelf");
+    shelf.replaceChildren();
+
+    fruits.forEach((fruit, index) => {
+      const chip = document.createElement("div");
+      chip.className = "fruit-chip";
+      chip.innerHTML = "<span>" + fruit.emoji + "</span><span>" + fruit.name + "</span>";
+
+      if (index === currentFruit) {
+        chip.style.borderColor = fruit.color;
+        chip.style.color = "#fff";
+      }
+
+      shelf.appendChild(chip);
+    });
+  }
+
+  function drawNext() {
+    const w = nextCanvas.width;
+    const h = nextCanvas.height;
+    nctx.clearRect(0, 0, w, h);
+
+    const fruit = fruits[nextFruit];
+    const r = 27;
+
+    nctx.beginPath();
+    nctx.arc(w / 2, h / 2, r, 0, Math.PI * 2);
+    nctx.fillStyle = fruit.color;
+    nctx.fill();
+
+    nctx.font = "30px system-ui";
+    nctx.textAlign = "center";
+    nctx.textBaseline = "middle";
+    nctx.fillText(fruit.emoji, w / 2, h / 2 + 1);
+  }
+
+  function resizeCanvas() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    draw();
+  }
+
+  function roundedRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function drawBackground() {
+    const gradient = ctx.createLinearGradient(0, 0, 0, H);
+    gradient.addColorStop(0, "#292f51");
+    gradient.addColorStop(1, "#171b31");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = "rgba(255,255,255,.035)";
+    ctx.lineWidth = 1;
+
+    for (let x = 24; x < W; x += 24) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
+      ctx.stroke();
+    }
+
+    for (let y = 24; y < H; y += 24) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = "#353d60";
+    ctx.fillRect(0, 0, WALL, H);
+    ctx.fillRect(W - WALL, 0, WALL, H);
+    ctx.fillRect(0, FLOOR, W, H - FLOOR);
+
+    ctx.fillStyle = "#687293";
+    ctx.fillRect(0, FLOOR, W, 4);
+
+    ctx.strokeStyle = "rgba(255,220,109,.6)";
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath();
+    ctx.moveTo(WALL, DANGER_LINE);
+    ctx.lineTo(W - WALL, DANGER_LINE);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = "#e7d69c";
+    ctx.font = "10px system-ui";
+    ctx.textAlign = "left";
+    ctx.fillText("DANGER LINE", WALL + 5, DANGER_LINE - 7);
+  }
+
+  function drawFruit(x, y, level, alpha = 1) {
+    const fruit = fruits[level];
+    const r = fruit.r;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+
+    ctx.shadowColor = fruit.color;
+    ctx.shadowBlur = 9;
+
+    const g = ctx.createRadialGradient(
+      x - r * .3, y - r * .35, Math.max(1, r * .08),
+      x, y, r
+    );
+
+    g.addColorStop(0, "#ffffff");
+    g.addColorStop(.17, fruit.color);
+    g.addColorStop(1, shade(fruit.color, -35));
+
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = g;
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+
+    ctx.beginPath();
+    ctx.arc(x - r * .28, y - r * .3, r * .15, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,.55)";
+    ctx.fill();
+
+    ctx.font = Math.max(12, r * 1.12) + "px system-ui";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(fruit.emoji, x, y + r * .04);
+
+    ctx.restore();
+  }
+
+  function shade(hex, amount) {
+    const num = parseInt(hex.replace("#", ""), 16);
+    let r = (num >> 16) + amount;
+    let g = ((num >> 8) & 255) + amount;
+    let b = (num & 255) + amount;
+
+    r = clamp(r, 0, 255);
+    g = clamp(g, 0, 255);
+    b = clamp(b, 0, 255);
+
+    return "#" + [r, g, b].map(v => v.toString(16).padStart(2, "0")).join("");
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    drawBackground();
+
+    if (started && !gameOver && canDrop) {
+      const r = radius(currentFruit);
+      const x = clamp(aimX, WALL + r, W - WALL - r);
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,255,255,.18)";
+      ctx.setLineDash([5, 6]);
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H - r);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      drawFruit(x, 38, currentFruit, .82);
+    }
+
+    for (const obj of objects) {
+      drawFruit(obj.x, obj.y, obj.level);
+    }
+
+    if (paused && started && !gameOver) {
+      ctx.fillStyle = "#090d1bbb";
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "#fff";
+      ctx.textAlign = "center";
+      ctx.font = "900 29px system-ui";
+      ctx.fillText("PAUSED", W / 2, H / 2);
+      ctx.font = "14px system-ui";
+      ctx.fillText("Tap Resume to continue", W / 2, H / 2 + 28);
+    }
+
+    if (gameOver) {
+      ctx.fillStyle = "#090d1b88";
+      ctx.fillRect(0, 0, W, H);
+    }
+  }
+
+  function hideAllPanels() {
+    $("homePanel").classList.add("hidden");
+    $("settingsPanel").classList.add("hidden");
+    $("overPanel").classList.add("hidden");
+  }
+
+  function startGame() {
+    if (raf) cancelAnimationFrame(raf);
+
+    objects = [];
+    score = 0;
+    dangerTime = 0;
+
+    currentFruit = randomFruit();
+    nextFruit = randomFruit();
+    aimX = W / 2;
+
+    canDrop = true;
+    started = true;
+    gameOver = false;
+    paused = false;
+
+    power = {swap:3,bomb:2,grow:2,mix:2};
+
+    $("modalLayer").classList.add("hidden");
+    hideAllPanels();
+
+    updateUI();
+    draw();
+
+    lastTime = performance.now();
+    raf = requestAnimationFrame(loop);
+  }
+
+  function endGame() {
+    if (gameOver) return;
+
+    gameOver = true;
+    paused = false;
+
+    if (score > best) {
+      best = score;
+      save(BEST_KEY, best);
+    }
+
+    updateUI();
+    draw();
+
+    $("modalLayer").classList.remove("hidden");
+    hideAllPanels();
+    $("overPanel").classList.remove("hidden");
+
+    sound(180, .25, "sawtooth");
+  }
+
+  function dropFruit() {
+    if (!started || paused || gameOver || !canDrop) return;
+
+    const r = radius(currentFruit);
+    const x = clamp(aimX, WALL + r, W - WALL - r);
+    const spawnY = 39;
+
+    const blocked = objects.some(obj => {
+      const dx = obj.x - x;
+      const dy = obj.y - spawnY;
+      return Math.hypot(dx, dy) < obj.r + r + 3;
+    });
+
+    if (blocked) {
+      showToast("Try another position!");
+      return;
+    }
+
+    objects.push({
+      x,
+      y: spawnY,
+      vx: 0,
+      vy: 20,
+      level: currentFruit,
+      age: 0
+    });
+
+    sound(320 + currentFruit * 40, .05);
+    currentFruit = nextFruit;
+    nextFruit = randomFruit();
+
+    canDrop = false;
+    updateUI();
+    draw();
+
+    setTimeout(() => {
+      canDrop = true;
+      draw();
+    }, 260);
+  }
+
+  function addPoints(value) {
+    score += value;
+
+    if (score > best) {
+      best = score;
+      save(BEST_KEY, best);
+    }
+
+    updateUI();
+  }
+
+  /*
+   * Merge just one pair per physics step.
+   * This keeps object updates predictable.
+   */
+  function tryMergePair() {
+    for (let i = 0; i < objects.length; i++) {
+      const a = objects[i];
+
+      for (let j = i + 1; j < objects.length; j++) {
+        const b = objects[j];
+
+        if (a.level !== b.level || a.level >= fruits.length - 1) {
+          continue;
+        }
+
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const distance = Math.hypot(dx, dy);
+
+        if (distance >= a.r + b.r) continue;
+
+        const massA = a.r * a.r;
+        const massB = b.r * b.r;
+
+        const x = (a.x * massA + b.x * massB) / (massA + massB);
+        const y = (a.y * massA + b.y * massB) / (massA + massB);
+
+        const level = a.level + 1;
+        const r = radius(level);
+
+        objects.splice(j, 1);
+        objects.splice(i, 1);
+
+        objects.push({
+          x: clamp(x, WALL + r, W - WALL - r),
+          y: clamp(y, r + 2, FLOOR - r),
+          vx: 0,
+          vy: -100,
+          level,
+          age: 0
+        });
+
+        addPoints(fruits[level].points);
+        sound(520 + level * 55, .12, "triangle");
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function physics(dt) {
+    const gravity = GRAVITY[stage] || GRAVITY.classic;
+
+    for (const obj of objects) {
+      obj.age += dt;
+      obj.vy = Math.min(obj.vy + gravity * dt, 1150);
+
+      obj.x += obj.vx * dt;
+      obj.y += obj.vy * dt;
+
+      obj.vx *= Math.pow(.994, dt * 60);
+
+      if (obj.x - obj.r < WALL) {
+        obj.x = WALL + obj.r;
+        obj.vx = Math.abs(obj.vx) * .18;
+      }
+
+      if (obj.x + obj.r > W - WALL) {
+        obj.x = W - WALL - obj.r;
+        obj.vx = -Math.abs(obj.vx) * .18;
+      }
+
+      if (obj.y + obj.r > FLOOR) {
+        obj.y = FLOOR - obj.r;
+
+        if (obj.vy > 35) {
+          obj.vy = -obj.vy * .08;
+        } else {
+          obj.vy = 0;
+        }
+
+        obj.vx *= .94;
+      }
+    }
+
+    if (tryMergePair()) {
+      return;
+    }
+
+    for (let i = 0; i < objects.length; i++) {
+      const a = objects[i];
+
+      for (let j = i + 1; j < objects.length; j++) {
+        const b = objects[j];
+
+        let dx = b.x - a.x;
+        let dy = b.y - a.y;
+        let d = Math.hypot(dx, dy);
+        const minimum = a.r + b.r;
+
+        if (d >= minimum) continue;
+
+        if (d < .001) {
+          dx = .01;
+          dy = .01;
+          d = Math.hypot(dx, dy);
+        }
+
+        const nx = dx / d;
+        const ny = dy / d;
+        const overlap = minimum - d;
+
+        const moveA = b.r / (a.r + b.r);
+        const moveB = a.r / (a.r + b.r);
+
+        a.x -= nx * overlap * moveA;
+        a.y -= ny * overlap * moveA;
+        b.x += nx * overlap * moveB;
+        b.y += ny * overlap * moveB;
+
+        const relativeVx = b.vx - a.vx;
+        const relativeVy = b.vy - a.vy;
+        const along = relativeVx * nx + relativeVy * ny;
+
+        if (along < 0) {
+          const impulse = -along * .4;
+          a.vx -= impulse * nx;
+          a.vy -= impulse * ny;
+          b.vx += impulse * nx;
+          b.vy += impulse * ny;
+        }
+      }
+    }
+
+    // Keep corrected fruit inside the basket.
+    for (const obj of objects) {
+      obj.x = clamp(obj.x, WALL + obj.r, W - WALL - obj.r);
+
+      if (obj.y + obj.r > FLOOR) {
+        obj.y = FLOOR - obj.r;
+        obj.vy = 0;
+      }
+
+      if (!Number.isFinite(obj.x) || !Number.isFinite(obj.y)) {
+        obj.x = W / 2;
+        obj.y = H / 2;
+        obj.vx = 0;
+        obj.vy = 0;
+      }
+    }
+
+    objects = objects.filter(obj =>
+      Number.isFinite(obj.x) && Number.isFinite(obj.y)
+    );
+
+    const danger = objects.some(obj =>
+      obj.y - obj.r < DANGER_LINE &&
+      obj.age > 1.5 &&
+      Math.abs(obj.vy) < 65
+    );
+
+    if (danger) {
+      dangerTime += dt;
+    } else {
+      dangerTime = Math.max(0, dangerTime - dt * 1.5);
+    }
+
+    if (dangerTime >= 2) {
+      endGame();
+    }
+  }
+
+  function loop(now) {
+    if (!started || gameOver) {
+      draw();
+      raf = 0;
+      return;
+    }
+
+    if (paused) {
+      draw();
+      raf = requestAnimationFrame(loop);
+      return;
+    }
+
+    const dt = Math.min(Math.max((now - lastTime) / 1000, 0), 1 / 30);
+    lastTime = now;
+
+    physics(dt);
+    draw();
+
+    raf = requestAnimationFrame(loop);
+  }
+
+  function positionFromEvent(event) {
+    const rect = canvas.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * W;
+    const r = radius(currentFruit);
+
+    return clamp(x, WALL + r, W - WALL - r);
+  }
+
+  canvas.addEventListener("pointermove", event => {
+    if (!started || paused || gameOver || !canDrop) return;
+
+    aimX = positionFromEvent(event);
+    draw();
+  });
+
+  canvas.addEventListener("pointerdown", event => {
+    if (!started || paused || gameOver) return;
+
+    event.preventDefault();
+    aimX = positionFromEvent(event);
+    dropFruit();
+  });
+
+  canvas.addEventListener("keydown", event => {
+    const r = radius(currentFruit);
+
+    if (event.key === "ArrowLeft") {
+      aimX = clamp(aimX - 18, WALL + r, W - WALL - r);
+      draw();
+    } else if (event.key === "ArrowRight") {
+      aimX = clamp(aimX + 18, WALL + r, W - WALL - r);
+      draw();
+    } else if (event.key === " " || event.key === "Enter") {
+      event.preventDefault();
+      dropFruit();
+    }
+  });
+
+  function usePower(name) {
+    if (!started || paused || gameOver) return;
+
+    if (!power[name]) {
+      showToast("No charges left!");
+      return;
+    }
+
+    if (name === "swap") {
+      currentFruit = randomFruit();
+      nextFruit = randomFruit();
+      power.swap--;
+      showToast("Fruit changed!");
+      sound(650, .09, "triangle");
+    }
+
+    if (name === "bomb") {
+      if (!objects.length) {
+        showToast("Drop a fruit first!");
+        return;
+      }
+
+      // Remove the largest fruit currently in the basket.
+      let largest = 0;
+
+      for (let i = 1; i < objects.length; i++) {
+        if (objects[i].level > objects[largest].level) {
+          largest = i;
+        }
+      }
+
+      const removed = objects.splice(largest, 1)[0];
+
+      addPoints(fruits[removed.level].points);
+      power.bomb--;
+
+      showToast("Fruit cleared! 💥");
+      sound(190, .18, "sawtooth");
+    }
+
+    if (name === "grow") {
+      currentFruit = (currentFruit + 1) % fruits.length;
+      power.grow--;
+
+      showToast("Next fruit upgraded!");
+      sound(500, .1, "triangle");
+    }
+
+    if (name === "mix") {
+      objects.forEach(obj => {
+        obj.vx += rand(-160, 160);
+        obj.vy -= rand(20, 100);
+      });
+
+      power.mix--;
+      showToast("Mix activated!");
+      sound(380, .13, "triangle");
+    }
+
+    updateUI();
+    draw();
+  }
+
+  function openSettings() {
+    $("modalLayer").classList.remove("hidden");
+
+    const isHomeOpen = !$("homePanel").classList.contains("hidden");
+
+    $("settingsPanel").dataset.returnHome = isHomeOpen ? "yes" : "no";
+
+    hideAllPanels();
+    $("settingsPanel").classList.remove("hidden");
+
+    if (started && !gameOver) paused = true;
+
+    $("stageSelect").value = stage;
+    $("soundToggle").checked = soundOn;
+
+    updateUI();
+    draw();
+  }
+
+  function closeSettings() {
+    stage = $("stageSelect").value;
+    soundOn = $("soundToggle").checked;
+
+    save(STAGE_KEY, stage);
+    save(SOUND_KEY, soundOn ? "on" : "off");
+
+    $("modalLayer").classList.add("hidden");
+    $("settingsPanel").classList.add("hidden");
+
+    if ($("settingsPanel").dataset.returnHome === "yes" && !started) {
+      $("modalLayer").classList.remove("hidden");
+      $("homePanel").classList.remove("hidden");
+    } else if (started && !gameOver) {
+      paused = false;
+      lastTime = performance.now();
+    }
+
+    updateUI();
+    draw();
+  }
+
+  function goHome() {
+    if (raf) cancelAnimationFrame(raf);
+
+    started = false;
+    paused = false;
+
+    $("modalLayer").classList.remove("hidden");
+    hideAllPanels();
+    $("homePanel").classList.remove("hidden");
+
+    updateUI();
+    draw();
+  }
+
+  function togglePause() {
+    if (!started || gameOver) {
+      showToast("Press Play Now to start!");
+      return;
+    }
+
+    paused = !paused;
+
+    if (!paused) lastTime = performance.now();
+
+    updateUI();
+    draw();
+  }
+
+  // All buttons are connected directly in this file.
+  $("playNow").addEventListener("click", startGame);
+  $("playAgainBtn").addEventListener("click", startGame);
+  $("restartBtn").addEventListener("click", startGame);
+
+  $("settingsBtn").addEventListener("click", openSettings);
+  $("homeSettingsBtn").addEventListener("click", openSettings);
+  $("closeSettings").addEventListener("click", closeSettings);
+  $("applySettings").addEventListener("click", closeSettings);
+  $("resumeBtn").addEventListener("click", closeSettings);
+
+  $("pauseBtn").addEventListener("click", togglePause);
+  $("overHomeBtn").addEventListener("click", goHome);
+
+  $("bSwap").addEventListener("click", () => usePower("swap"));
+  $("bBomb").addEventListener("click", () => usePower("bomb"));
+  $("bGrow").addEventListener("click", () => usePower("grow"));
+  $("bMix").addEventListener("click", () => usePower("mix"));
+
+  $("stageSelect").value = stage;
+  $("soundToggle").checked = soundOn;
+
+  window.addEventListener("resize", resizeCanvas);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && started && !gameOver && !paused) {
+      paused = true;
+      updateUI();
+      draw();
+    }
+  });
+
+  // Initialise the game screen.
+  resizeCanvas();
+  updateUI();
+  draw();
+
+  $("modalLayer").classList.remove("hidden");
+  $("homePanel").classList.remove("hidden");
+  $("settingsPanel").classList.add("hidden");
+  $("overPanel").classList.add("hidden");
+
+})();
+</script>
 
 </body>
 </html>
