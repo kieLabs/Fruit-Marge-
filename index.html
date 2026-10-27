@@ -1,114 +1,125 @@
-<div id="fruitMergeCard" style="
-  max-width:480px;
-  margin:20px auto;
-  overflow:hidden;
-  border-radius:20px;
-  background:#fff8df;
-  box-shadow:0 5px 16px #0002;
-  font-family:Arial,sans-serif;
-">
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10251e">
+  <meta name="description" content="Play Fruit Merge Game for free. Drop and merge fruits, unlock bigger fruits and beat your high score.">
 
-  <!-- GAME LIST CARD / LOGO -->
-  <div id="fruitMergeCover" style="
-    padding:24px 16px;
-    text-align:center;
-    background:linear-gradient(145deg,#96a9cf,#c49a6b);
-  ">
+  <title>Fruit Merge Game — Play Free Online</title>
 
-    <div style="
-      width:90px;
-      height:90px;
-      margin:0 auto 14px;
-      border-radius:24px;
-      background:#fff8df;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:58px;
-    ">🍉</div>
+  <!-- Connect CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    <h2 style="
-      margin:0;
-      color:#fff8df;
-      font-size:28px;
-      font-weight:900;
-    ">FRUIT MERGE</h2>
+<main id="app">
 
-    <p style="
-      margin:10px 0 18px;
-      color:#603719;
-      font-weight:bold;
-    ">Drop • Merge • Grow</p>
+  <!-- Welcome screen -->
+  <section id="lobby" class="screen">
+    <div class="logo">🍉</div>
+    <p class="eyebrow">A SWEET LITTLE PUZZLE</p>
 
-    <button id="fruitMergePlay" type="button" style="
-      width:100%;
-      max-width:270px;
-      padding:15px;
-      border:3px solid white;
-      border-radius:16px;
-      background:#68db28;
-      color:white;
-      font-size:18px;
-      font-weight:900;
-      cursor:pointer;
-    ">▶ PLAY NOW</button>
+    <h1>FRUIT <span>MERGE</span></h1>
+    <p class="tagline">Drop • Merge • Grow</p>
 
+    <div class="fruit-line">🍒 🫐 🍋 🍇 🍊 🍎 🍑 🥥 🍉</div>
+
+    <button id="playNow" class="primary">▶ PLAY NOW</button>
+    <button id="lobbySettings" class="secondary">⚙ Settings &amp; Stages</button>
+
+    <p class="note">
+      Drop matching fruits together to make bigger fruits.
+      How big can you grow?
+    </p>
+  </section>
+
+  <!-- Game screen -->
+  <section id="gameScreen" class="screen hidden">
+
+    <header class="topbar">
+      <button id="homeBtn" class="icon" aria-label="Home">⌂</button>
+
+      <div class="scorebox">
+        <small>BEST <b id="bestVal">0</b></small>
+        <strong id="scoreVal">0</strong>
+      </div>
+
+      <div class="nextbox">
+        <small>NEXT</small>
+        <canvas id="nextCanvas" width="54" height="54"></canvas>
+      </div>
+
+      <button id="settingsBtn" class="icon" aria-label="Settings">⚙</button>
+    </header>
+
+    <nav class="boosters">
+      <button id="bSwap" class="boost">🔄 <b id="cSwap">4</b></button>
+      <button id="bBomb" class="boost">💣 <b id="cBomb">1</b></button>
+      <button id="bGrow" class="boost">⬆️ <b id="cGrow">4</b></button>
+      <button id="bMix" class="boost">🎲 <b id="cMix">5</b></button>
+    </nav>
+
+    <div id="playfield">
+      <canvas id="canvas" aria-label="Tap or click to drop a fruit"></canvas>
+      <div id="aimHint">TAP OR CLICK TO DROP</div>
+    </div>
+
+    <div id="shelf" aria-label="Fruit evolution guide"></div>
+
+    <p class="help">Drop fruits • Match two identical fruits to merge</p>
+
+    <div id="toast" role="status"></div>
+  </section>
+
+  <!-- Settings and game-over modal -->
+  <div id="modalLayer" class="modal-layer hidden">
+    <section class="modal" role="dialog" aria-modal="true">
+
+      <button id="closeModal" class="close" aria-label="Close">×</button>
+      <h2 id="modalTitle">SETTINGS</h2>
+
+      <div id="settingsPanel">
+        <label class="row">
+          Stage
+          <select id="stageSelect">
+            <option value="1">Stage 1 — Easy</option>
+            <option value="2">Stage 2 — Classic</option>
+            <option value="3">Stage 3 — Quick</option>
+            <option value="4">Stage 4 — Expert</option>
+            <option value="5">Stage 5 — Chaos</option>
+          </select>
+        </label>
+
+        <label class="row">
+          Sound effects
+          <input id="soundToggle" type="checkbox" checked>
+        </label>
+
+        <p class="modal-note">
+          Higher stages increase gravity and the variety of starting fruits.
+        </p>
+
+        <button id="applySettings" class="primary">APPLY SETTINGS</button>
+        <button id="resumeBtn" class="secondary">RESUME GAME</button>
+      </div>
+
+      <div id="overPanel" class="hidden">
+        <p class="final-score">Score: <strong id="finalScore">0</strong></p>
+        <button id="restartBtn" class="primary">PLAY AGAIN</button>
+        <button id="overHomeBtn" class="secondary">BACK TO HOME</button>
+      </div>
+
+    </section>
   </div>
 
-  <!-- GAME FRAME: HIDDEN UNTIL PLAY NOW -->
-  <div id="fruitMergeGameArea" style="display:none;">
+</main>
 
-    <iframe
-      id="fruitMergeFrame"
-      title="Fruit Merge Game"
-      src="about:blank"
-      data-src="https://YOUR-USERNAME.github.io/fruit-merge-game/"
-      allow="fullscreen; gamepad"
-      allowfullscreen
-      style="
-        display:block;
-        width:100%;
-        height:760px;
-        border:0;
-        background:#96a9cf;
-      ">
-    </iframe>
+<!-- Physics library must load before game.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js" defer></script>
 
-  </div>
+<!-- Connect JavaScript -->
+<script src="game.js" defer></script>
 
-</div>
-
-<script>
-(function(){
-
-  var playButton = document.getElementById("fruitMergePlay");
-  var cover = document.getElementById("fruitMergeCover");
-  var gameArea = document.getElementById("fruitMergeGameArea");
-  var frame = document.getElementById("fruitMergeFrame");
-
-  playButton.addEventListener("click", function(){
-
-    var gameURL = frame.getAttribute("data-src");
-
-    if (!gameURL ||
-        gameURL.indexOf("YOUR-USERNAME") !== -1) {
-      alert("Please add your GitHub Pages URL first.");
-      return;
-    }
-
-    cover.style.display = "none";
-    gameArea.style.display = "block";
-
-    if (frame.getAttribute("src") === "about:blank") {
-      frame.setAttribute("src", gameURL);
-    }
-
-    // Request fullscreen following the user's click.
-    if (frame.requestFullscreen) {
-      frame.requestFullscreen().catch(function(){});
-    }
-
-  });
-
-})();
-</script>
+</body>
+</html>
